@@ -7,6 +7,7 @@ using MyShop.Core.Contracts;
 using MyShop.Core.Models;
 using MyShop.Core.ViewModels;
 using MyShop.DataAccess.InMemory;
+using MyShop.DataAccess.SQL;
 
 namespace MyShop.WebUI.Controllers
 {
@@ -16,8 +17,9 @@ namespace MyShop.WebUI.Controllers
         IRepository<ProductCategory> productCategories;
         public ProductManagerController()
         {
-            Context = new InMemoryRepository<Product>();
-            productCategories =new InMemoryRepository<ProductCategory>();
+            DataContext DContext = new DataContext();
+            Context = new SQLRepository<Product>(DContext);
+            productCategories = new SQLRepository<ProductCategory>(DContext);
         }
         // GET: ProductManager
         public ActionResult Index()
