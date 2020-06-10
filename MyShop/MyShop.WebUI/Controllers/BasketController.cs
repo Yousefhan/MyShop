@@ -15,6 +15,7 @@ namespace MyShop.WebUI.Controllers
         IBasketService basketService;
         IRepository<Basket> BasketContext;
         IRepository<Product> ProductContext;
+        IOrderService orderService;
         // GET: Basket
         public ActionResult Index()
         {
@@ -43,6 +44,30 @@ namespace MyShop.WebUI.Controllers
             BasketContext = new SQLRepository<Basket>(DContext);
             ProductContext = new SQLRepository<Product>(DContext);
             basketService = new BasketService(ProductContext,BasketContext);
+            orderService = new OrderService(new SQLRepository<Order>(DContext));
+        }
+        public ActionResult CheckOut ()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CheckOut(Order order)
+        {
+            var basektItem = basketService.GetBasketItems(this.HttpContext);
+            order.OrderStatus = "Order Created";
+            // proccess payment 
+
+            order.OrderStatus = "Payment Proccessed";
+            orderService.CreateOrder(order, basektItem);
+            basketService.ClearBasket(this.HttpContext);
+
+            return RedirectToAction("ThankYou",new { OrderId = order.Id });
+        }
+        public ActionResult ThankYou(string OrderId)
+        {
+            ViewBag.OrderId = OrderId;
+            return View();
         }
     }
 }
